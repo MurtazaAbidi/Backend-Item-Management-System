@@ -9,7 +9,7 @@ sqlConn.connection
 router.get('/', async (req, res) => {
     try {
         const result = await sqlConn.connection.query(`SELECT * FROM items`)
-        if (result.rowCount === 0) throw new Error('items Does Not Exist.')
+        if (result.rowCount === 0) res.json([])
         else {
             res.json(result.rows)
         }
@@ -60,5 +60,23 @@ router.delete('/delete/:id', async (req, res) => {
         return res.status(500).json({ msg: `${error.message}` });
     }
 });
+
+router.put('/update/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(id)
+        const UpdateItem = {
+            name: req.body.name,
+            description: req.body.description,
+            price: Number(req.body.price),
+        };
+        console.log(UpdateItem)
+        const update = await sqlConn.connection.query(`Update items set name='${UpdateItem.name}', description='${UpdateItem.description}', price=${UpdateItem.price} where id=${id}`);
+        if (update.rowCount === 1) console.log(`Item Updated Successfully whose id=${id}.`);
+        res.send('Item Updated Successfully.')
+    } catch (error) {
+        return res.status(500).json({ msg: `${error.message}` });
+    }
+})
 
 module.exports = router;

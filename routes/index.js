@@ -21,17 +21,31 @@ router.get('/', async (req, res) => {
 router.post('/add', async (req, res) => {
     try {
         const addNewItem = {
+            id: req.body.id,
             name: req.body.name,
             description: req.body.description,
             price: req.body.price,
         };
         console.log(addNewItem)
-        const insert = await sqlConn.connection.query(`INSERT INTO items (name, description, price) VALUES ('${addNewItem.name}', '${addNewItem.description}', '${addNewItem.price}')`);
-        if (insert.rowCount === 1) console.log('Campaigner Inserted Successfully.');
-        res.status(201).send('Campaigner Inserted Successfully.')
+        const insert = await sqlConn.connection.query(`INSERT INTO items (id, name, description, price) VALUES ('${addNewItem.id}', '${addNewItem.name}', '${addNewItem.description}', '${addNewItem.price}')`);
+        if (insert.rowCount === 1) console.log('Item Inserted Successfully.');
+        res.status(201).send('Item Inserted Successfully.')
     } catch (error) {
         return res.status(500).json({ msg: `${error.message}` });
     }
 });
+
+router.delete('/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dlt = await sqlConn.connection.query(`Delete from items where id=${id}`);
+        if (dlt.rowCount === 1) console.log(`Item Deleted Successfully whose id=${id}.`);
+        res.status(201).send('Item Deleted Successfully.')
+    } catch (error) {
+        return res.status(500).json({ msg: `${error.message}` });
+    }
+});
+
+
 
 module.exports = router;

@@ -8,6 +8,8 @@ const indexRoutes = require("./routes/index");
 
 app.use(cors());
 require('dotenv').config();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.get('/', (req, res)=>{
     console.log("Api working fine");
@@ -15,7 +17,7 @@ app.get('/', (req, res)=>{
     res.json({message:'Api working fine'})
 })
 
-app.use("/api/", indexRoutes);
+app.use("/api/items", indexRoutes);
 
 server.listen(process.env.PORT, () => {
     console.log("SERVER running at port "+`${process.env.PORT}`)

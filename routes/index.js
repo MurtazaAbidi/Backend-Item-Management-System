@@ -18,6 +18,21 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await sqlConn.connection.query(`SELECT * FROM items where id=${id}`)
+        if (result.rowCount === 1) {
+            res.json(result.rows[0])
+        }
+        else {
+            throw new Error(`item(id=${id}) Does Not Exist.`)
+        }
+    } catch (error) {
+        return res.status(500).json({ msg: `${error.message}` });
+    }
+});
+
 router.post('/add', async (req, res) => {
     try {
         const addNewItem = {
@@ -45,7 +60,5 @@ router.delete('/delete/:id', async (req, res) => {
         return res.status(500).json({ msg: `${error.message}` });
     }
 });
-
-
 
 module.exports = router;

@@ -1,30 +1,51 @@
 const express = require('express');
 const router = express.Router();
-const sqlConn = require ('../connection')
+const sqlConn = require('../connection')
 sqlConn.connection
-  .connect()
-  .then(() => console.log("Database Connected ..."))
-  .catch((err) => console.error("Connection error", err.stack));
+    .connect()
+    .then(() => console.log("Database Connected ..."))
+    .catch((err) => console.error("Connection error", err.stack));
 
-router.get ('/items', async (req, res) => {
-  // console.log(req.body.email);
-  // console.log(req.body.password);
-  try {
-  const result = await sqlConn.connection.query(`SELECT * FROM items`)
-    if (result.rowCount === 0) throw new Error ('items Does Not Exist.')
-    else{
-        res.json(result.rows)
+router.get('/', async (req, res) => {
+    try {
+        const result = await sqlConn.connection.query(`SELECT * FROM items`)
+        if (result.rowCount === 0) throw new Error('items Does Not Exist.')
+        else {
+            res.json(result.rows)
+        }
+    } catch (error) {
+        return res.status(500).json({ msg: `${error.message}` });
     }
-  } catch (error) {
-    return res.status(500).json({ msg: `${error.message}` });
-  }
 });
-// router.post ('/signup', indexcontroller.campaigner_signup);
-// router.post ('/reset-password', indexcontroller.campaigner_resetpassword);
-// router.get ('/change-password/:id/:token', indexcontroller.campaigner_changepassword);
-// router.post ('/change-password/:id/:token', indexcontroller.campaigner_submitchangepassword);
-// router.get ('/authorize',auth,  indexcontroller.authorize);
-// router.post ('/createcampaign', auth, indexcontroller.create_campaign);
-// router.get ('/logout', auth, indexcontroller.logout);
+
+router.post('/add', async (req, res) => {
+    try {
+        const addNewItem = {
+            id: req.body.id,
+            name: req.body.name,
+            description: req.body.description,
+            price: req.body.price,
+        };
+        console.log(addNewItem)
+        const insert = await sqlConn.connection.query(`INSERT INTO items (id, name, description, price) VALUES ('${addNewItem.id}', '${addNewItem.name}', '${addNewItem.description}', '${addNewItem.price}')`);
+        if (insert.rowCount === 1) console.log('Item Inserted Successfully.');
+        res.status(201).send('Item Inserted Successfully.')
+    } catch (error) {
+        return res.status(500).json({ msg: `${error.message}` });
+    }
+});
+
+router.delete('/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const dlt = await sqlConn.connection.query(`Delete from items where id=${id}`);
+        if (dlt.rowCount === 1) console.log(`Item Deleted Successfully whose id=${id}.`);
+        res.status(201).send('Item Deleted Successfully.')
+    } catch (error) {
+        return res.status(500).json({ msg: `${error.message}` });
+    }
+});
+
+
 
 module.exports = router;
